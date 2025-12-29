@@ -13,7 +13,7 @@ import './Sidebar.css';
 import { db } from '../../services/mockData';
 import { useAuth } from '../../context/AuthContext';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose }) => {
     const { user } = useAuth();
     const [pendingCount, setPendingCount] = useState(0);
     const location = useLocation();
@@ -49,7 +49,7 @@ const Sidebar = () => {
     }, [user]);
 
     return (
-        <aside className="sidebar">
+        <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
             <div className="sidebar-header">
                 <div className="flex items-center gap-3 px-2">
                     {!imgError ? (
@@ -77,6 +77,7 @@ const Sidebar = () => {
                             key={item.path}
                             to={item.path}
                             className={`nav-item ${isActive ? 'active' : ''}`}
+                            onClick={() => onClose && onClose()}
                         >
                             <Icon size={20} />
                             <span>{item.label}</span>

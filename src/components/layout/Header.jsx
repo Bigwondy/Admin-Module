@@ -1,14 +1,21 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, UserCircle } from 'lucide-react';
+import { LogOut, UserCircle, Menu } from 'lucide-react';
 import './Header.css';
 
-const Header = () => {
+const Header = ({ onToggleSidebar }) => {
     const { user, logout } = useAuth();
 
     return (
         <header className="header">
-            <div className="header-profile">
+            <button 
+                className="md:hidden p-2 hover:bg-slate-100 rounded-lg mr-4"
+                onClick={onToggleSidebar}
+            >
+                <Menu size={24} className="text-slate-600" />
+            </button>
+
+            <div className="header-profile ml-auto">
                 <div className="profile-info">
                     <span className="profile-name">{user?.email || 'Admin User'}</span>
                     <span className="profile-role">{user?.accessLevel || 'Administrator'}</span>
