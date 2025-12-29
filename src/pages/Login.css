@@ -1,0 +1,147 @@
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.login-blob {
+    position: absolute;
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.2;
+    z-index: 0;
+}
+
+.blob-1 {
+    top: -20%;
+    left: -10%;
+    background: var(--color-accent);
+}
+
+.blob-2 {
+    bottom: -20%;
+    right: -10%;
+    background: var(--color-success);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 2.5rem;
+    border-radius: 1rem;
+    position: relative;
+    z-index: 10;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-header h1 {
+    font-size: 1.8rem;
+    color: var(--color-primary);
+    margin-bottom: 0.5rem;
+}
+
+.login-header p {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.error-message {
+    background-color: #fef2f2;
+    border: 1px solid #fee2e2;
+    color: var(--color-danger);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-primary-light);
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.input-field {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 3.5rem; /* Increased space to 3.5rem to prevent overlap */
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    text-align: left; /* Ensure text doesn't center */
+    background: rgba(255, 255, 255, 0.6);
+    transition: all var(--transition-fast);
+}
+
+.input-field:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 4px var(--color-accent-glow);
+    background: white;
+}
+
+.submit-btn {
+    width: 100%;
+    background: var(--color-accent);
+    color: var(--color-primary); /* Dark text on Yellow button */
+    border: none;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all var(--transition-fast);
+    margin-top: 1rem;
+}
+
+.submit-btn:hover:not(:disabled) {
+    background: #e6a60f; /* Darker yellow hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.submit-btn:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.login-footer {
+    margin-top: 2rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
