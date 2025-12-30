@@ -109,7 +109,26 @@ const SEED_DATA = {
         currentLevel: 1, // Waiting for Level 1 (Branch Manager)
         authListId: 'auth_card_req',
         history: []
+      {
+        id: 'req_102',
+        type: 'Card Request',
+        customerName: 'Jane Smith',
+        branch: 'Downtown Branch',
+        date: new Date().toISOString(),
+        status: 'Pending',
+        currentLevel: 1, // Waiting for Level 1 (Branch Manager)
+        authListId: 'auth_card_req',
+        history: []
     }
+  ],
+  ACTIVITY: [
+      { id: 'log_seed_1', action: 'LOGIN', actor: 'admin@bank.com', target: 'System', details: 'Successful login', timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString() },
+      { id: 'log_seed_2', action: 'APPROVE_REQUEST', actor: 'branch_manager@bank.com', target: 'Card Request', details: 'Approved Level 1', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString() },
+      { id: 'log_seed_3', action: 'SUBMIT_REQUEST', actor: 'teller@bank.com', target: 'Card Request', details: 'Submitted new approval request', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString() },
+      { id: 'log_seed_4', action: 'CREATE_USER', actor: 'admin@bank.com', target: 'new_staff@bank.com', details: 'Created user. Email sent.', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString() },
+      { id: 'log_seed_5', action: 'LOGIN', actor: 'branch_manager@bank.com', target: 'System', details: 'Successful login', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 25).toISOString() },
+      { id: 'log_seed_6', action: 'UPDATE_ROLE', actor: 'super_admin@bank.com', target: 'Branch Manager', details: 'Updated role permissions', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString() },
+      { id: 'log_seed_7', action: 'LOGOUT', actor: 'teller@bank.com', target: 'System', details: 'User logged out', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 50).toISOString() }
   ]
 };
 
@@ -126,7 +145,7 @@ class MockDB {
       localStorage.setItem(DB_KEYS.ROLES, JSON.stringify(SEED_DATA.ROLES));
     }
     if (!localStorage.getItem(DB_KEYS.ACTIVITY)) {
-      localStorage.setItem(DB_KEYS.ACTIVITY, JSON.stringify([]));
+      localStorage.setItem(DB_KEYS.ACTIVITY, JSON.stringify(SEED_DATA.ACTIVITY));
     }
     // Force update Auth Lists to ensure new permissions apply
     localStorage.setItem('admin_module_auth_lists', JSON.stringify(SEED_DATA.AUTH_LISTS));
