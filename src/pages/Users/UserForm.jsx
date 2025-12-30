@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Save, ArrowLeft, Loader2 } from 'lucide-react';
 import { db } from '../../services/mockData';
+import { useAuth } from '../../context/AuthContext';
 import './Users.css';
 
 const UserForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const isEditMode = !!id;
 
     const [formData, setFormData] = useState({
@@ -90,7 +92,7 @@ const UserForm = () => {
                         accessLevel: formData.accessLevel,
                         roleId: formData.roleId
                     }
-                }, 'current_user@bank.com');
+                }, user?.email || 'unknown@bank.com');
                 
                 alert('User modification request submitted for approval.');
                 navigate('/dashboard/users');
@@ -100,7 +102,7 @@ const UserForm = () => {
                     throw new Error('User with this email already exists');
                 }
                 
-                await db.addRequest('User Creation', formData, 'current_user@bank.com'); 
+                await db.addRequest('User Creation', formData, user?.email || 'unknown@bank.com'); 
                 
                 alert('User creation request submitted for approval.');
                 navigate('/dashboard/users'); // Go back to list

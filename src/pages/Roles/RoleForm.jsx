@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Save, ArrowLeft, Loader2 } from 'lucide-react';
 import { db } from '../../services/mockData';
+import { useAuth } from '../../context/AuthContext';
 import './Roles.css';
 
 const MODULES = ['Lyra CMS', 'Lyra Prepaid', 'Lyra Credit', 'FIP'];
@@ -29,6 +30,7 @@ const ACTIONS = ['Create', 'View', 'Edit', 'Delete'];
 const RoleForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const isEditMode = !!id;
 
     const [formData, setFormData] = useState({
@@ -111,10 +113,10 @@ const RoleForm = () => {
                 await db.addRequest('Role Modification', {
                     id: id,
                     data: roleData
-                }, 'current_user@bank.com');
+                }, user?.email || 'unknown@bank.com');
                 alert('Role modification request submitted for approval.');
             } else {
-                await db.addRequest('Role Creation', roleData, 'current_user@bank.com');
+                await db.addRequest('Role Creation', roleData, user?.email || 'unknown@bank.com');
                 alert('Role creation request submitted for approval.');
             }
 
