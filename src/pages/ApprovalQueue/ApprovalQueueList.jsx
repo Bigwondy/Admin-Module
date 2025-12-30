@@ -15,27 +15,30 @@ const ApprovalQueueList = () => {
         }
     }, [user]);
 
-    const loadRequests = () => {
+    const loadRequests = async () => {
         setIsLoading(true);
-        setTimeout(() => {
-            const pending = db.getPendingRequestsForRole(user.roleId);
+        try {
+            const pending = await db.getPendingRequestsForRole(user.roleId);
             setRequests(pending);
+        } catch (error) {
+            console.error("Error loading requests:", error);
+        } finally {
             setIsLoading(false);
-        }, 500);
+        }
     };
 
-    const handleApprove = (id) => {
+    const handleApprove = async (id) => {
         if (window.confirm('Approve this request?')) {
-            const success = db.approveRequest(id, user.email);
+            const success = await db.approveRequest(id, user.email);
             if (success) {
                 loadRequests();
             }
         }
     };
 
-    const handleDecline = (id) => {
+    const handleDecline = async (id) => {
         if (window.confirm('Decline this request?')) {
-            const success = db.declineRequest(id, user.email);
+            const success = await db.declineRequest(id, user.email);
             if (success) {
                 loadRequests();
             }

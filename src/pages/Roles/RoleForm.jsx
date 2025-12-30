@@ -41,15 +41,17 @@ const RoleForm = () => {
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
-        if (isEditMode) {
-            const role = db.getRoles().find(r => r.id === id);
-            if (role) {
-                setFormData({ name: role.name, module: role.module });
-                // Assuming role.permissions is stored as we expect, or we might need to parse it
-                // For this mock, let's assume it's stored exactly as our state structure
-                setPermissions(role.permissions || {});
+        const init = async () => {
+             if (isEditMode) {
+                const roles = await db.getRoles();
+                const role = roles.find(r => r.id === id);
+                if (role) {
+                    setFormData({ name: role.name, module: role.module });
+                    setPermissions(role.permissions || {});
+                }
             }
-        }
+        };
+        init();
     }, [id, isEditMode]);
 
     const handleModuleChange = (e) => {
@@ -106,13 +108,13 @@ const RoleForm = () => {
             };
 
             if (isEditMode) {
-                db.addRequest('Role Modification', {
+                await db.addRequest('Role Modification', {
                     id: id,
                     data: roleData
                 }, 'current_user@bank.com');
                 alert('Role modification request submitted for approval.');
             } else {
-                db.addRequest('Role Creation', roleData, 'current_user@bank.com');
+                await db.addRequest('Role Creation', roleData, 'current_user@bank.com');
                 alert('Role creation request submitted for approval.');
             }
 

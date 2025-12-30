@@ -14,13 +14,20 @@ const AuthListList = () => {
         loadData();
     }, []);
 
-    const loadData = () => {
+    const loadData = async () => {
         setIsLoading(true);
-        setTimeout(() => {
-            setLists(db.getAuthLists());
-            setRoles(db.getRoles());
+        try {
+            const [listsData, rolesData] = await Promise.all([
+                db.getAuthLists(),
+                db.getRoles()
+            ]);
+            setLists(listsData);
+            setRoles(rolesData);
+        } catch (error) {
+            console.error("Error loading auth lists:", error);
+        } finally {
             setIsLoading(false);
-        }, 400);
+        }
     };
 
     const getRoleName = (roleId) => {
@@ -28,9 +35,9 @@ const AuthListList = () => {
         return role ? role.name : 'Unknown Role';
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this authorization workflow?')) {
-            const success = db.deleteAuthList(id);
+            const success = await db.deleteAuthList(id);
             if (success) {
                 loadData();
             }

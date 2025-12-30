@@ -21,32 +21,40 @@ const UserForm = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        // Load roles
-        const availableRoles = db.getRoles();
-        setRoles(availableRoles);
+        const init = async () => {
+            // Load roles
+            const availableRoles = await db.getRoles();
+            setRoles(availableRoles);
 
-        if (isEditMode) {
-            loadUser(id);
-        }
+            if (isEditMode) {
+                await loadUser(id);
+            }
+        };
+        init();
     }, [id, isEditMode]);
 
-    const loadUser = (userId) => {
+    const loadUser = async (userId) => {
         setIsLoading(true);
-        // Simulate fetch
-        setTimeout(() => {
-            const user = db.getUsers().find(u => u.id === userId);
+        try {
+            // Inefficient but matches previous logic; better to have getUserById
+            const allUsers = await db.getUsers(); 
+            const user = allUsers.find(u => u.id === userId);
+            
             if (user) {
                 setFormData({
                     email: user.email,
                     accessLevel: user.accessLevel,
                     roleId: user.roleId,
-
                 });
             } else {
                 setError('User not found');
             }
+        } catch (error) {
+            console.error("Error loading user:", error);
+            setError("Failed to load user details");
+        } finally {
             setIsLoading(false);
-        }, 300);
+        }
     };
 
     const handleChange = (e) => {
@@ -75,7 +83,7 @@ const UserForm = () => {
 
             if (isEditMode) {
                 // Submit Modification Request
-                db.addRequest('User Modification', {
+                await db.addRequest('User Modification', {
                     id: id,
                     data: {
                         email: formData.email,
@@ -87,17 +95,12 @@ const UserForm = () => {
                 alert('User modification request submitted for approval.');
                 navigate('/dashboard/users');
             } else {
-                if (db.findUserByEmail(formData.email)) {
+                const existingUser = await db.findUserByEmail(formData.email);
+                if (existingUser) {
                     throw new Error('User with this email already exists');
                 }
-                // Submit Request instead of direct add
-                // We mock the "Initiator" as the currently logged in user (or 'admin' if not available in context here easily, 
-                // but we really should use AuthContext. For now, hardcode or pass it.)
-                // Actually, we can get it from localStorage or assume context is handled. 
-                // Let's passed a hardcoded initiator for now or assume the service handles it. 
-                // Revised service method signature: addRequest(type, payload, initiatorEmail)
                 
-                db.addRequest('User Creation', formData, 'current_user@bank.com'); 
+                await db.addRequest('User Creation', formData, 'current_user@bank.com'); 
                 
                 alert('User creation request submitted for approval.');
                 navigate('/dashboard/users'); // Go back to list

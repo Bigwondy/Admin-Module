@@ -5,7 +5,7 @@ export const authService = {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    const user = db.findUserByEmail(email);
+    const user = await db.findUserByEmail(email);
 
     if (!user || user.password !== password) {
       throw new Error('Incorrect login details');
@@ -15,7 +15,7 @@ export const authService = {
     const { password: _, ...userWithoutPassword } = user;
     
     // Log activity
-    db.logActivity('LOGIN', email, 'System', 'User logged in successfully');
+    await db.logActivity('LOGIN', email, 'System', 'User logged in successfully');
 
     return userWithoutPassword;
   },

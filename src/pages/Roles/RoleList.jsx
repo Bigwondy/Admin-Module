@@ -13,17 +13,21 @@ const RoleList = () => {
         loadRoles();
     }, []);
 
-    const loadRoles = () => {
+    const loadRoles = async () => {
         setIsLoading(true);
-        setTimeout(() => {
-            setRoles(db.getRoles());
+        try {
+            const data = await db.getRoles();
+            setRoles(data);
+        } catch (error) {
+            console.error("Error loading roles:", error);
+        } finally {
             setIsLoading(false);
-        }, 400);
+        }
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this role?')) {
-            const success = db.deleteRole(id);
+            const success = await db.deleteRole(id);
             if (success) {
                 loadRoles();
             }

@@ -11,15 +11,18 @@ const HistoryList = () => {
         loadHistory();
     }, []);
 
-    const loadHistory = () => {
+    const loadHistory = async () => {
         setIsLoading(true);
-        setTimeout(() => {
-            const allRequests = db.getRequests();
+        try {
+            const allRequests = await db.getRequests();
             // Filter for Approved or Declined
             const closedRequests = allRequests.filter(r => r.status !== 'Pending');
             setHistory(closedRequests);
+        } catch (error) {
+            console.error("Error loading history:", error);
+        } finally {
             setIsLoading(false);
-        }, 400);
+        }
     };
 
     return (

@@ -32,20 +32,13 @@ const Sidebar = ({ isOpen, onClose }) => {
         // Safety check: ensure user exists
         if (!user || !user.roleId) return;
 
-        const checkPending = () => {
-            try {
-                // Defensive call
-                const requests = db.getPendingRequestsForRole(user.roleId);
-                setPendingCount(requests ? requests.length : 0);
-            } catch (err) {
-                console.error("Error fetching pending count:", err);
-            }
-        };
+        // Subscribe to real-time updates for the badge
+        const unsubscribe = db.subscribeToPendingCount(user.roleId, (count) => {
+            setPendingCount(count);
+        });
 
-        checkPending();
-        const interval = setInterval(checkPending, 2000);
-
-        return () => clearInterval(interval);
+        // Cleanup subscription
+        return () => unsubscribe();
     }, [user]);
 
     return (

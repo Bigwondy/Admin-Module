@@ -8,23 +8,16 @@ const ActivityLogs = () => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        loadLogs();
-    }, []);
-
-    const loadLogs = () => {
         setIsLoading(true);
-        setTimeout(() => {
-            // Get logs from localStorage directly via db method we added (or assume we need to add getter)
-            // Wait, we didn't add getLogs public method, but mockData stores it in localStorage.
-            // We'll read localStorage directly here or update mockData. 
-            // Better to update mockData. But I can't easily. 
-            // I'll read from localStorage for expediency or assume I added it?
-            // Actually, I can add a getter quickly or just parse localstorage.
-            const storedLogs = JSON.parse(localStorage.getItem('admin_module_activity') || '[]');
-            setLogs(storedLogs);
+        // Subscribe to real-time updates
+        const unsubscribe = db.subscribeToActivity((newLogs) => {
+            setLogs(newLogs);
             setIsLoading(false);
-        }, 300);
-    };
+        });
+
+        // Cleanup subscription on unmount
+        return () => unsubscribe();
+    }, []);
 
     const getIcon = (action) => {
         if (action.includes('USER')) return <User size={20} />;
@@ -56,7 +49,7 @@ const ActivityLogs = () => {
                                             <span className="font-bold">{log.actor}</span> performed {log.action} on <span className="font-semibold text-slate-800">{log.target}</span>
                                         </span>
                                         <span className="log-time">
-                                            {new Date(log.timestamp).toLocaleString()}
+                                            {log.timestamp && new Date(log.timestamp.toDate ? log.timestamp.toDate() : log.timestamp).toLocaleString()}
                                         </span>
                                     </div>
                                     <div className="log-meta">

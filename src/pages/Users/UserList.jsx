@@ -15,19 +15,21 @@ const UserList = () => {
         loadUsers();
     }, []);
 
-    const loadUsers = () => {
+    const loadUsers = async () => {
         setIsLoading(true);
-        // Simulate network
-        setTimeout(() => {
-            const data = db.getUsers();
+        try {
+            const data = await db.getUsers();
             setUsers(data);
+        } catch (error) {
+            console.error("Error loading users:", error);
+        } finally {
             setIsLoading(false);
-        }, 500);
+        }
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = async (id) => {
         if (window.confirm('Are you sure you want to delete this user?')) {
-            const success = db.deleteUser(id);
+            const success = await db.deleteUser(id);
             if (success) {
                 loadUsers();
             }

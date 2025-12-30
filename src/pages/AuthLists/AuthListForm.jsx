@@ -29,13 +29,17 @@ const AuthListForm = () => {
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
-        setRoles(db.getRoles());
-        if (isEditMode) {
-            const list = db.getAuthLists().find(l => l.id === id);
-            if (list) {
-                setFormData(list);
+        const init = async () => {
+            setRoles(await db.getRoles());
+            if (isEditMode) {
+                const lists = await db.getAuthLists();
+                const list = lists.find(l => l.id === id);
+                if (list) {
+                    setFormData(list);
+                }
             }
-        }
+        };
+        init();
     }, [id, isEditMode]);
 
     const handleChange = (e) => {
@@ -49,12 +53,12 @@ const AuthListForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSaving(true);
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // await new Promise(resolve => setTimeout(resolve, 500)); // Remove mock delay
 
         if (isEditMode) {
-            db.updateAuthList(id, formData);
+            await db.updateAuthList(id, formData);
         } else {
-            db.addAuthList(formData);
+            await db.addAuthList(formData);
         }
 
         navigate('/dashboard/auth-lists');
