@@ -109,16 +109,6 @@ const SEED_DATA = {
         currentLevel: 1, // Waiting for Level 1 (Branch Manager)
         authListId: 'auth_card_req',
         history: []
-      {
-        id: 'req_102',
-        type: 'Card Request',
-        customerName: 'Jane Smith',
-        branch: 'Downtown Branch',
-        date: new Date().toISOString(),
-        status: 'Pending',
-        currentLevel: 1, // Waiting for Level 1 (Branch Manager)
-        authListId: 'auth_card_req',
-        history: []
     }
   ],
   ACTIVITY: [
@@ -144,9 +134,19 @@ class MockDB {
     if (!localStorage.getItem(DB_KEYS.ROLES)) {
       localStorage.setItem(DB_KEYS.ROLES, JSON.stringify(SEED_DATA.ROLES));
     }
-    if (!localStorage.getItem(DB_KEYS.ACTIVITY)) {
-      localStorage.setItem(DB_KEYS.ACTIVITY, JSON.stringify(SEED_DATA.ACTIVITY));
+
+    // Smart seeding for Activity Logs: Merge if seed data is missing
+    const currentActivity = JSON.parse(localStorage.getItem(DB_KEYS.ACTIVITY) || '[]');
+    const hasSeed = currentActivity.some(log => log.id === 'log_seed_1');
+    
+    if (!hasSeed) {
+        // Merge seed data with current logs
+        const newActivity = [...currentActivity, ...SEED_DATA.ACTIVITY];
+        // Sort by timestamp desc (newest first)
+        newActivity.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        localStorage.setItem(DB_KEYS.ACTIVITY, JSON.stringify(newActivity));
     }
+
     // Force update Auth Lists to ensure new permissions apply
     localStorage.setItem('admin_module_auth_lists', JSON.stringify(SEED_DATA.AUTH_LISTS));
     if (!localStorage.getItem('admin_module_requests')) {
