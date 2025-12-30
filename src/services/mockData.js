@@ -50,7 +50,44 @@ const SEED_DATA = {
        createdAt: new Date().toISOString()
     }
   ],
-  // ... other lists can be migrated as needed, keeping it minimal for now to avoid huge file size
+  AUTH_LISTS: [
+    {
+      requestType: 'User Creation',
+      approvalLevel: 1,
+      level1Role: 'role_super_admin',
+      createdAt: new Date().toISOString()
+    },
+    {
+      requestType: 'User Modification',
+      approvalLevel: 1,
+      level1Role: 'role_super_admin',
+      createdAt: new Date().toISOString()
+    },
+    {
+      requestType: 'Role Creation',
+      approvalLevel: 1,
+      level1Role: 'role_super_admin',
+      createdAt: new Date().toISOString()
+    },
+    {
+      requestType: 'Role Modification',
+      approvalLevel: 1,
+      level1Role: 'role_super_admin',
+      createdAt: new Date().toISOString()
+    },
+    {
+      requestType: 'Card Request',
+      approvalLevel: 1,
+      level1Role: 'role_super_admin',
+      createdAt: new Date().toISOString()
+    },
+    {
+      requestType: 'Branch Stock Request',
+      approvalLevel: 1,
+      level1Role: 'role_super_admin',
+      createdAt: new Date().toISOString()
+    }
+  ]
 };
 
 class FirebaseDB {
@@ -66,16 +103,26 @@ class FirebaseDB {
             const snapshot = await getDocs(query(usersRef, limit(1)));
             if (snapshot.empty) {
                 console.log("Seeding Database...");
+                
                 // Seed Users
-                SEED_DATA.USERS.forEach(async (u) => {
+                for (const u of SEED_DATA.USERS) {
                     await addDoc(usersRef, u);
-                });
+                }
+                
                 // Seed Roles
                 const rolesRef = collection(firestore, COLLECTIONS.ROLES);
-                SEED_DATA.ROLES.forEach(async (r) => {
+                for (const r of SEED_DATA.ROLES) {
                     await addDoc(rolesRef, r);
-                });
-                this.logActivity('SYSTEM', 'System', 'Database', 'Initial Seed Completed');
+                }
+                
+                // Seed Auth Lists
+                const authListsRef = collection(firestore, COLLECTIONS.AUTH_LISTS);
+                for (const al of SEED_DATA.AUTH_LISTS) {
+                    await addDoc(authListsRef, al);
+                }
+                
+                await this.logActivity('SYSTEM', 'System', 'Database', 'Initial Seed Completed');
+                console.log("Database seeding complete!");
             }
         } catch (e) {
             console.error("Error checking seed:", e);
