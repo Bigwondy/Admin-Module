@@ -133,6 +133,9 @@ const HistoryList = () => {
                         <tbody>
                             {history.map(req => {
                                 const isExpanded = expandedRows.has(req.id);
+                                const submittedAction = req.history && req.history.length > 0 
+                                    ? req.history.find(h => h.action === 'Submitted')
+                                    : null;
                                 const finalAction = req.history && req.history.length > 0 
                                     ? req.history[req.history.length - 1] 
                                     : null;
@@ -147,7 +150,9 @@ const HistoryList = () => {
                                                 <span className="font-semibold text-slate-700">{req.type}</span>
                                             </td>
                                             <td>
-                                                <span className="font-medium">{req.customerName}</span>
+                                                <span className="font-medium">
+                                                    {submittedAction ? submittedAction.actor : req.customerName}
+                                                </span>
                                             </td>
                                             <td>
                                                 <span className={`status-cell ${req.status === 'Approved' ? 'status-approved' : 'status-declined'}`}>
