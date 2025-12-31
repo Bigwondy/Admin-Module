@@ -1,4 +1,5 @@
 import { db as firestore } from './firebase';
+import { emailService } from './emailService';
 import { 
     collection, 
     getDocs, 
@@ -143,7 +144,16 @@ class FirebaseDB {
             createdAt: new Date().toISOString() 
         };
         const docRef = await addDoc(collection(firestore, COLLECTIONS.USERS), newUser);
-        this.logActivity('CREATE_USER', 'System', newUser.email, `Created user.`);
+        
+        // Send welcome email with credentials
+        const emailResult = await emailService.sendWelcomeEmail(newUser.email, newUser.password);
+        
+        if (emailResult.success) {
+            this.logActivity('CREATE_USER', 'System', newUser.email, `Created user. Welcome email sent successfully.`);
+        } else {
+            this.logActivity('CREATE_USER', 'System', newUser.email, `Created user. Email failed to send: ${emailResult.error}. Password: ${newUser.password}`);
+        }
+        
         return { id: docRef.id, ...newUser };
     }
 
