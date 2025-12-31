@@ -3,6 +3,7 @@ import { emailService } from './emailService';
 import { 
     collection, 
     getDocs, 
+    getDoc,
     addDoc, 
     updateDoc, 
     deleteDoc, 
