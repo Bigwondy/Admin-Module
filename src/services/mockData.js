@@ -298,20 +298,62 @@ class FirebaseDB {
     }
 
     async approveRequest(id, actorEmail) {
-        // Need to fetch request and its auth list
-        const reqRef = doc(firestore, COLLECTIONS.REQUESTS, id);
-        // We can't do this easily in one transactional go without getting data first
-        // Simplified flow:
-        // 1. Get Request, 2. Get AuthList, 3. Update
-        // Note: Race conditions possible but acceptable for demo
-        // ... implementation omitted for brevity, will implement fully if requested
-        // For now, let's just update status to Approved for immediate gratification
-        await updateDoc(reqRef, {
-            status: 'Approved',
-            history: [{ level: 99, action: 'Approved', actor: actorEmail, date: new Date().toISOString() }] // simplified
-        });
-        this.logActivity('COMPLETE_REQUEST', actorEmail, 'Request', 'Request Approved');
-        return true;
+        try {
+            const reqRef = doc(firestore, COLLECTIONS.REQUESTS, id);
+            const reqSnap = await getDoc(reqRef);
+            if (!reqSnap.exists()) return false;
+            
+            const req = { id: reqSnap.id, ...reqSnap.data() };
+            const authLists = await this.getAuthLists();
+            const list = authLists.find(l => l.id === req.authListId || l.requestType === req.type);
+
+            if (!list) {
+                console.error("Auth list not found for request type:", req.type);
+                return false;
+            }
+
+            // Update History
+            const newHistory = [...(req.history || []), {
+                level: req.currentLevel,
+                action: 'Approved',
+                actor: actorEmail,
+                date: new Date().toISOString()
+            }];
+
+            if (req.currentLevel < list.approvalLevel) {
+                // Move to next level
+                await updateDoc(reqRef, {
+                    currentLevel: req.currentLevel + 1,
+                    history: newHistory
+                });
+                this.logActivity('APPROVE_REQUEST', actorEmail, req.type, `Approved Level ${req.currentLevel}, moved to Level ${req.currentLevel + 1}`);
+            } else {
+                // Final Approval - EXECUTE PAYLOAD
+                await updateDoc(reqRef, {
+                    status: 'Approved',
+                    history: newHistory
+                });
+                
+                this.logActivity('COMPLETE_REQUEST', actorEmail, req.type, 'Final approval granted. Executing action.');
+                
+                // Execute based on type
+                if (req.type === 'User Creation' && req.payload) {
+                    await this.addUser(req.payload);
+                } else if (req.type === 'User Modification' && req.payload) {
+                    await this.updateUser(req.payload.id, req.payload.data);
+                } else if (req.type === 'Role Creation' && req.payload) {
+                    await this.addRole(req.payload);
+                } else if (req.type === 'Role Modification' && req.payload) {
+                    await this.updateRole(req.payload.id, req.payload.data);
+                } else if (req.type === 'Branch Stock Request') {
+                    this.logActivity('STOCK_APPROVED', actorEmail, req.type, `Stock request for ${req.branch} approved.`);
+                }
+            }
+            return true;
+        } catch (e) {
+            console.error("Error approving request:", e);
+            return false;
+        }
     }
 
     async declineRequest(id, actorEmail) {
